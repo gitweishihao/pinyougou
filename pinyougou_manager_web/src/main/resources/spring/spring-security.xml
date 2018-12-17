@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans:beans
+        xmlns="http://www.springframework.org/schema/security"
+        xmlns:beans="http://www.springframework.org/schema/beans"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.springframework.org/schema/beans
+						    http://www.springframework.org/schema/beans/spring-beans.xsd
+						    http://www.springframework.org/schema/security
+						    http://www.springframework.org/schema/security/spring-security.xsd">
+    <!--配置登陆页面不被拦截-->
+    <http pattern="/login.html" security="none"></http>
+    <!--**:表示该目录及子目录中的文件不被拦截-->
+    <http pattern="/css/**" security="none"></http>
+    <http pattern="/img/**" security="none"></http>
+    <http pattern="/js/**" security="none"></http>
+    <http pattern="/plugins/**" security="none"></http>
+
+    <!--配置拦截规则  use-expressions:表示是否使用eple表达式-->
+    <http use-expressions="false">
+        <!--配置拦截路径，及配置角色权限-->
+        <intercept-url pattern="/**" access="ROLE_ADMIN"/>
+        <!--配置页面跳转
+        login-page="login.html":登陆页面
+        default-target-url="/admin/index.html":登陆成功后，跳转到运营商后台首页
+        authentication-failure-url="login.html":登陆失败后，跳转到登陆页面，继续登陆
+        always-use-default-target="true":不管访问任何路径，登陆成功后，必须一直跳转到运营商后台首页
+        -->
+        <form-login
+            login-page="/login.html"
+            default-target-url="/admin/index.html"
+            authentication-failure-url="/login.html"
+            always-use-default-target="true"
+            />
+        <!--配置跨域请求  安全机制，跨域请求伪造拦截机制-->
+        <csrf disabled="true"/>
+        <!-- iframe策略 -->
+        <headers>
+            <!--DENY：浏览器拒绝当前页面加载任何Frame页面
+                SAMEORIGIN：frame页面的地址只能为同源域名下的页面
+                ALLOW-FROM：origin为允许frame加载的页面地址。-->
+            <frame-options policy="SAMEORIGIN" />
+        </headers>
+        <!--配置退出系统 logout-url:退出路径：默认为退出后，跳转路径为登陆页面-->
+        <logout/>
+    </http>
+
+    <!--配置认证管理器-->
+    <authentication-manager>
+        <authentication-provider>
+            <!--配置假用户  authorities:给用户授予的角色，用于认证登陆-->
+            <user-service>
+                <user name="admin" password="123456" authorities="ROLE_ADMIN" />
+                <user name="sunwukong" password="dasheng" authorities="ROLE_ADMIN" />
+            </user-service>
+        </authentication-provider>
+    </authentication-manager>
+</beans:beans>

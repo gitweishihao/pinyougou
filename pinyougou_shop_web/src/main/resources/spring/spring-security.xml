@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans:beans
+        xmlns="http://www.springframework.org/schema/security"
+        xmlns:beans="http://www.springframework.org/schema/beans"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:dubbo="http://code.alibabatech.com/schema/dubbo"
+        xsi:schemaLocation="http://www.springframework.org/schema/beans
+						    http://www.springframework.org/schema/beans/spring-beans.xsd
+						    http://www.springframework.org/schema/security
+						    http://www.springframework.org/schema/security/spring-security.xsd
+						    http://code.alibabatech.com/schema/dubbo
+						    http://code.alibabatech.com/schema/dubbo/dubbo.xsd">
+
+    <!--**:表示该目录及子目录中的文件不被拦截-->
+    <http pattern="/css/**" security="none"></http>
+    <http pattern="/img/**" security="none"></http>
+    <http pattern="/js/**" security="none"></http>
+    <http pattern="/plugins/**" security="none"></http>
+    <!--配置商家注入页面不被拦截-->
+    <http pattern="/register.html" security="none"></http>
+    <!--商家注入请求路径不被拦截-->
+    <http pattern="/seller/add.do" security="none"></http>
+    <!--配置商家登陆页面不被拦截-->
+    <http pattern="/shoplogin.html" security="none"></http>
+
+    <!--配置拦截规则  use-expressions:表示是否使用eple表达式-->
+    <http use-expressions="false">
+        <!--配置拦截路径，及配置角色权限-->
+        <intercept-url pattern="/**" access="ROLE_SELLER"/>
+        <!--配置页面跳转
+        login-page="login.html":登陆页面
+        default-target-url="/admin/index.html":登陆成功后，跳转到运营商后台首页
+        authentication-failure-url="login.html":登陆失败后，跳转到登陆页面，继续登陆
+        always-use-default-target="true":不管访问任何路径，登陆成功后，必须一直跳转到运营商后台首页
+        -->
+        <form-login
+            login-page="/shoplogin.html"
+            default-target-url="/admin/index.html"
+            authentication-failure-url="/shoplogin.html"
+            always-use-default-target="true"
+            />
+        <!--配置跨域请求  安全机制，跨域请求伪造拦截机制-->
+        <csrf disabled="true"/>
+        <!-- iframe策略 -->
+        <headers>
+            <!--DENY：浏览器拒绝当前页面加载任何Frame页面
+                SAMEORIGIN：frame页面的地址只能为同源域名下的页面
+                ALLOW-FROM：origin为允许frame加载的页面地址。-->
+            <frame-options policy="SAMEORIGIN" />
+        </headers>
+        <!--配置退出系统 logout-url:退出路径：默认为退出后，跳转路径为登陆页面-->
+        <logout logout-url="shoplogin.html"/>
+    </http>
+
+    <!--配置认证管理器-->
+    <authentication-manager>
+        <!--配置认证提供者-->
+        <authentication-provider user-service-ref="userDetailService">
+            <!--向认证对象提供加密对象 用于认证加密后的密码-->
+            <password-encoder ref="passwordEncoding"></password-encoder>
+        </authentication-provider>
+    </authentication-manager>
+    <!--配置认证服务类-->
+    <beans:bean id="userDetailService" class="com.pinyougou.user.service.UserDetailServiceImpl">
+        <!--注入sellerService服务实现类-->
+        <beans:property name="sellerService" ref="sellerService"></beans:property>
+    </beans:bean>
+
+    <!--配置服务调用者 服务名称-->
+    <dubbo:application name="pyg_shop_web" />
+    <!--配置注册中心的地址-->
+    <dubbo:registry address="zookeeper://192.168.25.128:2181"/>
+    <!--引用dubbo服务-->
+    <dubbo:reference interface="com.pinyougou.sellergoods.service.SellerService" id="sellerService"/>
+
+    <!--登陆时需要对输入的密码加密 向容器中创建BCrypt加密对象-->
+    <beans:bean id="passwordEncoding" class="org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder"></beans:bean>
+</beans:beans>

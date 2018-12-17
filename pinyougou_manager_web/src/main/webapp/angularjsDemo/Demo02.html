@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>angularjs入门之数据双向绑定</title>
+    <!--引入angularjs的资源文件-->
+    <script type="text/javascript" src="../plugins/angularjs/angular.min.js"></script>
+</head>
+<!--ng-app:声明模块，作用：指定angularjs的作用范围-->
+<body ng-app>
+    <!--数据双向绑定：指的是模块数据（model）和视图数据（view)同步,即模块与视图的数据绑定，也就是数据同步-->
+    <!--ng-model：表示绑定模块数据的指令-->
+    请输入：<input type="text" ng-model="username"><br/>
+    <!--视图数据与模块数据绑定，即同步-->
+    输入的内容为：{{username}}
+</body>
+</html>

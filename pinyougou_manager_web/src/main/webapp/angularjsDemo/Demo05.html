@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>angularjs入门之mvc&模块化设计&控制器定义</title>
+    <!--引入angulaarjs文件-->
+    <script type="text/javascript" src="../plugins/angularjs/angular.min.js"></script>
+    <script type="text/javascript">
+        //angularjs框架 官方提供模块：ng ：核心模块 ngRoute:路由模块，用于页面的跳转  ngAnimate:用于展示动画，动画模块
+        //自定义模块 agular.module('模块名',[]) 参数一：模块名 参数二：依赖的其他模块，如果没有依赖
+        //其他模块，也需要声明空数组
+        var app = angular.module("myapp",[]);
+        //定义控制器：参数一：控制器名 参数二：控制器要做的事情，即定义一个函数
+        //$scope:angularjs内置的服务对象，它表示全局作用域对象 作用：html与js数据交互的桥梁
+        app.controller("myController",function ($scope) {
+            //定义一个方法
+            $scope.add = function () {
+                //parseInt:将字符串转换为int类型
+                $scope.z = parseInt($scope.x)+parseInt($scope.y)
+            }
+        })
+    </script>
+</head>
+<body>
+    <!--ng-app:声明模块，用于指定angularjs的作用范围 ng-controller:声明控制器-->
+    <div ng-app="myapp" ng-controller="myController">
+        <!--数据双向绑定：指的是模块数据（model）和视图数据（view)同步,即模块与视图的数据绑定，也就是数据同步-->
+        <!--ng-model：表示绑定模块数据的指令-->
+        X:<input type="text" ng-model="x">
+        Y:<input type="text" ng-model="y">
+        <!--ng-click：声明单击事件-->
+        <button ng-click="add()">相加</button>
+        <br/>
+        结果为：{{z}}
+    </div>
+</body>
+</html>
